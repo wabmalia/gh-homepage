@@ -1,6 +1,6 @@
 import React, { useEffect } from "react"
 import { format } from "date-fns"
-import { BrowserRouter as Router, Route, useHistory } from "react-router-dom"
+import { BrowserRouter as Router, Redirect, Route } from "react-router-dom"
 import { useHashParams } from "./hooks/use-params"
 import { useCookie } from "./hooks/use-cookies"
 import { isBefore } from "date-fns"
@@ -14,7 +14,7 @@ const AuthenticatorRouter = ({ baseRoute, redirectRoute, children }) => {
 				</CheckForToken>
 			</Route>
 			<Route path="/callback">
-				<RetrieveToken />
+				<RetrieveToken redirect={baseRoute}/>
 			</Route>
 		</Router>
 	)
@@ -27,7 +27,7 @@ const CheckForToken = ({ redirectRoute, children }) => {
 	const expirationTime = tokenPayload && JSON.parse(atob(tokenPayload)).exp
 	const expired = expirationTime && isBefore(new Date(expirationTime * 1000), Date.now())
 
-	const redirectUri = `${window.location.protocol}//${window.location.host}/${redirectRoute}}`
+	const redirectUri = `${window.location.protocol}//${window.location.host}/${redirectRoute}`
 	useEffect(() => {
 		if (!accessToken || expired) {
 			const state = format(Date.now(), 'ddMMyyyy')
@@ -46,15 +46,13 @@ const CheckForToken = ({ redirectRoute, children }) => {
 	return accessToken && !expired ? children : null
 }
 
-const RetrieveToken = () => {
-	const history = useHistory()
+const RetrieveToken = ({redirect}) => {
 	const hashParams = useHashParams()
 	const [, setAccessTokenCookie] = useCookie("access_token")
 
 	setAccessTokenCookie(hashParams.id_token)
-	history.replace("/")
-
-	return null
+	console.log(redirect)
+	return <Redirect to={redirect}/>
 }
 
 

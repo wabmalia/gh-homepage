@@ -1,9 +1,10 @@
-import "./app.scss"
+import React from "react"
 import AuthenticatorRouter from "./authenticator-router"
+import "./app.scss"
 
 const App = () => {
   return (
-    <AuthenticatorRouter baseRoute="/home" redirectRoute={"callback"}>
+    <AuthenticatorRouter baseRoute={process.env.BASE_ROUTE} redirectRoute={"callback"}>
       <div className="homepage">
         <h1>WIP: <b>Homepage</b></h1>
       </div>
